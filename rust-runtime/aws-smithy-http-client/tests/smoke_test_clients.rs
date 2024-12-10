@@ -70,7 +70,7 @@ async fn default_tls_client() {
     smoke_test_client(&client).await.unwrap();
 }
 
-#[cfg(feature = "rustls-ring")]
+#[cfg(any(feature = "rustls-ring", feature = "s2n-tls"))]
 #[tokio::test]
 async fn custom_dns_client() {
     use std::sync::atomic::{AtomicUsize, Ordering};
@@ -91,17 +91,25 @@ async fn custom_dns_client() {
             })
         }
     }
-    let resolver = PassThroughResolver {
-        inner: GaiResolver::new(),
-        count: Default::default(),
-    };
-    let client = Builder::new()
-        .tls_provider(tls::Provider::Rustls(
-            tls::rustls_provider::CryptoMode::Ring,
-        ))
-        .build_with_resolver(resolver.clone());
-    smoke_test_client(&client).await.unwrap();
-    assert_eq!(resolver.count.load(Ordering::Relaxed), 1);
+
+    let providers = [
+        #[cfg(feature = "rustls-ring")]
+        tls::Provider::Rustls(tls::rustls_provider::CryptoMode::Ring),
+        #[cfg(feature = "s2n-tls")]
+        tls::Provider::S2nTLS,
+    ];
+
+    for provider in providers {
+        let resolver = PassThroughResolver {
+            inner: GaiResolver::new(),
+            count: Default::default(),
+        };
+        let client = Builder::new()
+            .tls_provider(provider)
+            .build_with_resolver(resolver.clone());
+        smoke_test_client(&client).await.unwrap();
+        assert_eq!(resolver.count.load(Ordering::Relaxed), 1);
+    }
 }
 
 async fn smoke_test_client(client: &dyn HttpClient) -> Result<(), Box<dyn Error>> {
