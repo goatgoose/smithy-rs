@@ -54,9 +54,15 @@ pub(crate) mod cfg {
                 #[cfg(any(
                     feature = "rustls-aws-lc",
                     feature = "rustls-aws-lc-fips",
-                    feature = "rustls-ring"
+                    feature = "rustls-ring",
+                    feature = "s2n-tls",
                 ))]
-                #[cfg_attr(docsrs, doc(cfg(any(feature = "rustls-aws-lc", feature = "rustls-aws-lc-fips", feature = "rustls-ring"))))]
+                #[cfg_attr(docsrs, doc(cfg(any(
+                    feature = "rustls-aws-lc",
+                    feature = "rustls-aws-lc-fips",
+                    feature = "rustls-ring",
+                    feature = "s2n-tls",
+                ))))]
                 $item
             )*
         }
@@ -76,6 +82,18 @@ pub(crate) mod cfg {
             )*
         }
     }
+
+    macro_rules! cfg_s2n_tls {
+        ($($item:item)*) => {
+            $(
+                #[cfg(feature = "s2n-tls")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "s2n-tls")))]
+                $item
+            )*
+        }
+    }
+
     pub(crate) use cfg_rustls;
     pub(crate) use cfg_tls;
+    pub(crate) use cfg_s2n_tls;
 }

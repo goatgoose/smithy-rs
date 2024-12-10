@@ -65,6 +65,8 @@ rustls-ring = ["dep:rustls", "rustls?/ring", "dep:hyper-rustls", "hyper-1"]
 rustls-aws-lc = ["dep:rustls", "rustls?/aws_lc_rs", "dep:hyper-rustls", "hyper-1"]
 rustls-aws-lc-fips = ["dep:rustls", "rustls?/fips", "dep:hyper-rustls", "hyper-1"]
 
+s2n-tls = ["dep:s2n-tls", "dep:s2n-tls-hyper", "hyper-1"]
+
 [dependencies]
 aws-smithy-async = { path = "../aws-smithy-async" }
 aws-smithy-runtime-api = { path = "../aws-smithy-runtime-api", features = ["client"] }
@@ -83,6 +85,8 @@ http-1x = { package = "http", version = "1" , optional = true }
 http-body-1x = { package = "http-body", version = "1", optional = true}
 hyper-rustls = { version = "0.27", features = ["http2", "http1", "native-tokio", "tls12"], default-features = false, optional = true }
 rustls = { version = "0.23", default-features = false, optional = true }
+s2n-tls-hyper = { path = "/Users/vclarksa/w/s2n-tls-bindings/bindings/rust/s2n-tls-hyper", optional = true }
+s2n-tls = { path = "/Users/vclarksa/w/s2n-tls-bindings/bindings/rust/s2n-tls", optional = true }
 tower = { version = "0.5.1", optional = true }
 # end hyper 1.x stack deps
 

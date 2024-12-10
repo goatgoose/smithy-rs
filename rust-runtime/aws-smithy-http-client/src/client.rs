@@ -622,6 +622,16 @@ cfg_tls! {
                         );
                         self.wrap_connector(https_connector)
                     }
+                },
+                #[cfg(feature = "s2n-tls")]
+                tls::Provider::S2nTLS  => {
+                    if self.enable_cached_tls {
+                        let https_connector = tls::s2n_tls_provider::cached_connectors::cached_https();
+                        self.wrap_connector(https_connector)
+                    } else {
+                        let https_connector = tls::s2n_tls_provider::build_connector::wrap_connector(http_connector);
+                        self.wrap_connector(https_connector)
+                    }
                 }
             }
         }

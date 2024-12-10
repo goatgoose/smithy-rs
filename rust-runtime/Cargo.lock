@@ -162,6 +162,7 @@ dependencies = [
  "aws-lc-fips-sys",
  "aws-lc-sys",
  "paste",
+ "untrusted 0.7.1",
  "zeroize",
 ]
 
@@ -471,6 +472,8 @@ dependencies = [
  "pin-project-lite",
  "rustls 0.21.12",
  "rustls 0.23.19",
+ "s2n-tls",
+ "s2n-tls-hyper",
  "serde",
  "serde_json",
  "tokio",
@@ -3059,6 +3062,49 @@ name = "ryu"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
+
+[[package]]
+name = "s2n-tls"
+version = "0.3.8"
+dependencies = [
+ "errno",
+ "hex",
+ "libc",
+ "pin-project-lite",
+ "s2n-tls-sys",
+]
+
+[[package]]
+name = "s2n-tls-hyper"
+version = "0.0.1"
+dependencies = [
+ "http 1.2.0",
+ "hyper 1.5.1",
+ "hyper-util",
+ "s2n-tls",
+ "s2n-tls-tokio",
+ "tower-service",
+]
+
+[[package]]
+name = "s2n-tls-sys"
+version = "0.3.8"
+dependencies = [
+ "aws-lc-rs",
+ "cc",
+ "libc",
+]
+
+[[package]]
+name = "s2n-tls-tokio"
+version = "0.3.8"
+dependencies = [
+ "errno",
+ "libc",
+ "pin-project-lite",
+ "s2n-tls",
+ "tokio",
+]
 
 [[package]]
 name = "same-file"
