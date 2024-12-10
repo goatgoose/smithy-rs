@@ -55,8 +55,9 @@ cfg_s2n_tls! {
             }
 
             pub(crate) fn wrap_connector<R>(
-                http_connector: HttpConnector<R>,
+                mut http_connector: HttpConnector<R>,
             ) -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector<R>> {
+                http_connector.enforce_http(false);
                 let config = {
                     let mut builder = s2n_tls::config::Config::builder();
                     builder.set_security_policy(&s2n_tls::security::DEFAULT_TLS13).unwrap();
