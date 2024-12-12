@@ -124,6 +124,11 @@ required-features = ["rustls-aws-lc", "rustls-aws-lc-fips"]
 doc-scrape-examples = true
 
 [[example]]
+name = "client-s2n-tls"
+required-features = ["s2n-tls"]
+doc-scrape-examples = true
+
+[[example]]
 name = "custom-dns"
 required-features = ["rustls-ring"]
 doc-scrape-examples = true
