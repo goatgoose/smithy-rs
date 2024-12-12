@@ -21,54 +21,6 @@ pub enum Provider {
     // TODO(hyper1): consider native-tls support?
 }
 
-cfg_s2n_tls! {
-    /// s2n-tls based support and adapters
-    pub mod s2n_tls_provider {
-        pub(crate) mod cached_connectors {
-            use hyper_util::client::legacy as client;
-            use client::connect::HttpConnector;
-            use hyper_util::client::legacy::connect::dns::GaiResolver;
-            use super::build_connector::make_tls;
-
-            static CACHED_CONNECTOR: once_cell::sync::Lazy<
-                s2n_tls_hyper::connector::HttpsConnector<HttpConnector>,
-            > = once_cell::sync::Lazy::new(|| {
-                make_tls(GaiResolver::new())
-            });
-
-            pub(crate) fn cached_https() -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector> {
-                CACHED_CONNECTOR.clone()
-            }
-        }
-
-        pub(crate) mod build_connector {
-            use hyper_util::client::legacy as client;
-            use client::connect::HttpConnector;
-
-            pub(super) fn make_tls<R>(
-                resolver: R,
-            ) -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector<R>> {
-                // use the base connector through our `Connector` type to ensure defaults are consistent
-                let base_connector = crate::client::Connector::builder()
-                    .base_connector_with_resolver(resolver);
-                wrap_connector(base_connector)
-            }
-
-            pub(crate) fn wrap_connector<R>(
-                mut http_connector: HttpConnector<R>,
-            ) -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector<R>> {
-                http_connector.enforce_http(false);
-                let config = {
-                    let mut builder = s2n_tls::config::Config::builder();
-                    builder.set_security_policy(&s2n_tls::security::DEFAULT_TLS13).unwrap();
-                    builder.build().unwrap()
-                };
-                s2n_tls_hyper::connector::HttpsConnector::new_with_http(http_connector, config)
-            }
-        }
-    }
-}
-
 cfg_rustls! {
     /// rustls based support and adapters
     pub mod rustls_provider {
@@ -225,6 +177,56 @@ cfg_rustls! {
                     .enable_http1()
                     .enable_http2()
                     .wrap_connector(conn)
+            }
+        }
+    }
+}
+
+cfg_s2n_tls! {
+    /// s2n-tls based support and adapters
+    pub mod s2n_tls_provider {
+        pub(crate) mod cached_connectors {
+            use hyper_util::client::legacy as client;
+            use client::connect::HttpConnector;
+            use hyper_util::client::legacy::connect::dns::GaiResolver;
+            use super::build_connector::make_tls;
+
+            static CACHED_CONNECTOR: once_cell::sync::Lazy<
+                s2n_tls_hyper::connector::HttpsConnector<HttpConnector>,
+            > = once_cell::sync::Lazy::new(|| {
+                make_tls(GaiResolver::new())
+            });
+
+            pub(crate) fn cached_https() -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector> {
+                CACHED_CONNECTOR.clone()
+            }
+        }
+
+        pub(crate) mod build_connector {
+            use hyper_util::client::legacy as client;
+            use client::connect::HttpConnector;
+
+            pub(super) fn make_tls<R>(
+                resolver: R,
+            ) -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector<R>> {
+                // use the base connector through our `Connector` type to ensure defaults are consistent
+                let base_connector = crate::client::Connector::builder()
+                    .base_connector_with_resolver(resolver);
+                wrap_connector(base_connector)
+            }
+
+            pub(crate) fn wrap_connector<R>(
+                mut http_connector: HttpConnector<R>,
+            ) -> s2n_tls_hyper::connector::HttpsConnector<HttpConnector<R>> {
+                http_connector.enforce_http(false);
+                let config = {
+                    let mut builder = s2n_tls::config::Config::builder();
+                    builder.set_security_policy(&s2n_tls::security::DEFAULT_TLS13).unwrap();
+                    builder.build().unwrap()
+                };
+                let mut builder = s2n_tls_hyper::connector::HttpsConnector::builder_with_http(http_connector, config);
+                builder.with_insecure_http();
+                builder.build()
             }
         }
     }
