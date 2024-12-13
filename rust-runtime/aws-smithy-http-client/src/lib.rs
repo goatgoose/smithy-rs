@@ -94,6 +94,6 @@ pub(crate) mod cfg {
     }
 
     pub(crate) use cfg_rustls;
-    pub(crate) use cfg_tls;
     pub(crate) use cfg_s2n_tls;
+    pub(crate) use cfg_tls;
 }

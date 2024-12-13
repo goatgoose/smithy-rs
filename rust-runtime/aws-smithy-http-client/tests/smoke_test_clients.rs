@@ -21,7 +21,6 @@ use std::error::Error;
 use std::str::FromStr;
 use std::sync::Arc;
 use tower::Service;
-use aws_smithy_http_client::tls::Provider;
 
 #[cfg(feature = "rustls-ring")]
 #[tokio::test]
@@ -59,7 +58,7 @@ async fn aws_lc_client() {
 #[cfg(feature = "s2n-tls")]
 #[tokio::test]
 async fn s2n_tls_client() {
-    let client = Builder::new().tls_provider(Provider::S2nTLS).build_https();
+    let client = Builder::new().tls_provider(tls::Provider::S2nTLS).build_https();
     smoke_test_client(&client).await.unwrap();
 }
 
